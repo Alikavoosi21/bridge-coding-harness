@@ -1,0 +1,13 @@
+: keepalive
+
+event: harness
+id: evt_0002
+data: {"schema_version":1,"task_id":"task_demo0000000001","run_id":"run_demo0000000001","sequence":2,"event_id":"evt_0002","type":"message_started","occurred_at":2.0,"payload":{"message_id":"msg_1","part_id":"part_1"}}
+
+: keepalive
+
+event: harness
+data: {"schema_version":1,"task_id":"task_demo0000000001","run_id":"run_demo0000000001","sequence":3,"event_id":"evt_0003","type":"text_delta","occurred_at":3.0,"payload":{"message_id":"msg_1","part_id":"part_1","offset":0,"delta":"سلام"}}
+
+data: [DONE]
+

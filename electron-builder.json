@@ -1,0 +1,60 @@
+{
+  "appId": "ir.bridge.codingharness",
+  "productName": "Bridge Coding Harness",
+  "copyright": "",
+  "afterPack": "scripts/blank-product-author.cjs",
+  "electronVersion": "44.7.0",
+  "directories": {
+    "app": "release/app",
+    "buildResources": "build",
+    "output": "release/dist"
+  },
+  "files": [
+    "electron/**",
+    "out/**",
+    "package.json",
+    "!**/node_modules/**",
+    "!**/*.map"
+  ],
+  "extraResources": [
+    {
+      "from": "backend/dist/harness-server",
+      "to": "backend"
+    }
+  ],
+  "asar": true,
+  "npmRebuild": false,
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      },
+      {
+        "target": "zip",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "build/bridge-icon.ico",
+    "signExecutable": false,
+    "artifactName": "Bridge-Coding-Harness-${version}-win-${arch}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "build/bridge-icon.ico",
+    "uninstallerIcon": "build/bridge-icon.ico",
+    "installerHeaderIcon": "build/bridge-icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Bridge Coding Harness",
+    "uninstallDisplayName": "Bridge Coding Harness",
+    "deleteAppDataOnUninstall": false,
+    "artifactName": "Bridge-Coding-Harness-Setup-${version}.${ext}"
+  }
+}

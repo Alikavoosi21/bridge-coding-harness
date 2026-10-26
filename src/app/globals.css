@@ -1,0 +1,472 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'streamdown/styles.css';
+
+@source "../";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Vazirmatn (SIL Open Font License, see fonts/OFL.txt) ships with the app, so it
+   looks the same on every machine and needs no network. The FD variant draws
+   digits in their Persian form. Code and technical values use the mono stack. */
+@font-face {
+  font-family: 'Vazirmatn FD';
+  src: url('./fonts/Vazirmatn-FD-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn FD';
+  src: url('./fonts/Vazirmatn-FD-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn FD';
+  src: url('./fonts/Vazirmatn-FD-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn FD';
+  src: url('./fonts/Vazirmatn-FD-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --font-sans: 'Vazirmatn FD', 'Segoe UI', Tahoma, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-strong: var(--primary-strong);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+  --color-code: var(--code);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 12px;
+  --radius-3xl: 12px;
+
+  --shadow-overlay: var(--elevation-overlay);
+  --shadow-float: var(--elevation-float);
+
+  --ease-default: cubic-bezier(0.2, 0, 0, 1);
+
+  --animate-shimmer: shimmer 1.8s linear infinite;
+  --animate-pulse-dot: pulse-dot 1.4s ease-in-out infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(0.8);
+    }
+  }
+}
+
+/* One approved dark system. Primitive values live in the design package's
+   tokens.json; components consume these semantic names only. */
+:root,
+.dark {
+  color-scheme: dark;
+
+  --background: #010a04;
+  --foreground: #ffffff;
+  --surface: #191c21;
+  --panel: #101712;
+  --raised: #222a25;
+  --card: #101712;
+  --card-foreground: #ffffff;
+  --popover: #191c21;
+  --popover-foreground: #ffffff;
+  --primary: #4ade80;
+  --primary-foreground: #010a04;
+  --primary-soft: #12351f;
+  --primary-strong: #86efac;
+  --secondary: #222a25;
+  --secondary-foreground: #e8ede9;
+  --muted: #101712;
+  --muted-foreground: #b8c2bb;
+  --faint: #9ca89f;
+  --accent: #28352c;
+  --accent-foreground: #ffffff;
+  --destructive: #fda4af;
+  --border: #2c3930;
+  --border-strong: #91a798;
+  --input: #58705f;
+  --ring: #4ade80;
+  --hover: #28352c;
+  --active: #12351f;
+  --code: #080d0b;
+  --sidebar: #080e0b;
+  --sidebar-foreground: #b8c2bb;
+  --sidebar-border: #2c3930;
+  --text-disabled: #6d7870;
+
+  --success: #86efac;
+  --success-soft: #102b1b;
+  --warning: #fcd34d;
+  --warning-soft: #30270f;
+  --danger: #fda4af;
+  --danger-soft: #31171e;
+  --info: #93c5fd;
+  --info-soft: #122336;
+
+  --chart-1: #4ade80;
+  --chart-2: #93c5fd;
+  --chart-3: #c4b5fd;
+  --chart-4: #fcd34d;
+  --chart-5: #fda4af;
+
+  --elevation-overlay: 0 16px 48px #00000066;
+  --elevation-float: 0 8px 24px #0000004d;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  ::selection {
+    background: #4ade80;
+    color: #010a04;
+  }
+
+  html {
+    @apply font-sans;
+    font-size: 16px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-size: 15px;
+    line-height: 28px;
+    overflow: hidden;
+  }
+
+  /* The keyboard ring is a visible outline, never a decorative shadow. */
+  :focus-visible {
+    outline: 2px solid var(--ring) !important;
+    outline-offset: 3px;
+  }
+
+  /* Tailwind v4 resets buttons to the default cursor. */
+  :is(a[href], button, [role='button'], [role='tab'], [role='menuitem'], [role='option'], [role='switch'], label[for], summary):not(
+      :disabled
+    ):not([data-disabled]) {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-foreground;
+    text-wrap: balance;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Latin / numeric runs that must keep their own direction inside Persian text */
+@utility ltr-nums {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+@utility scrollbar-minimal {
+  scrollbar-width: thin;
+  scrollbar-color: #2c3930 transparent;
+  &:hover {
+    scrollbar-color: #58705f transparent;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility text-shimmer {
+  background: linear-gradient(90deg, var(--muted-foreground) 35%, var(--foreground) 50%, var(--muted-foreground) 65%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: var(--animate-shimmer);
+}
+
+/* Electron: the title bar drags the window; anything interactive opts out. */
+.app-drag {
+  -webkit-app-region: drag;
+}
+.app-no-drag,
+.app-drag :is(button, a, input, [role='button']) {
+  -webkit-app-region: no-drag;
+}
+/* Electron only: an empty strip that clears the native window controls and drags the window. */
+.desktop-strip {
+  display: none;
+}
+.is-desktop .desktop-strip {
+  display: block;
+  height: 36px;
+  flex-shrink: 0;
+  background: var(--sidebar);
+}
+.is-desktop .shell-body {
+  padding-top: 0;
+}
+
+/* Sonner */
+[data-sonner-toaster] {
+  font-family: var(--font-sans);
+  max-width: 420px;
+}
+[data-sonner-toaster] [data-sonner-toast] {
+  font-family: var(--font-sans);
+  background: var(--popover);
+  border: 1px solid var(--border);
+  color: var(--popover-foreground);
+  box-shadow: var(--elevation-overlay);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 24px;
+}
+[data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: var(--muted-foreground);
+}
+
+/* A document laid out for reading: Markdown, Word and PowerPoint files */
+.doc-prose {
+  font-size: 15px;
+  line-height: 28px;
+  outline: none;
+}
+.doc-prose > :first-child {
+  margin-top: 0;
+}
+.doc-prose h1 {
+  font-size: 28px;
+  line-height: 40px;
+  margin: 1.2em 0 0.5em;
+  font-weight: 700;
+}
+.doc-prose h2 {
+  font-size: 22px;
+  line-height: 34px;
+  margin: 1.4em 0 0.5em;
+  font-weight: 600;
+}
+.doc-prose h3 {
+  font-size: 18px;
+  line-height: 28px;
+  margin: 1.2em 0 0.4em;
+  font-weight: 600;
+}
+.doc-prose p {
+  margin: 0.7em 0;
+}
+.doc-prose ul,
+.doc-prose ol {
+  margin: 0.7em 0;
+  padding-inline-start: 1.5em;
+}
+.doc-prose ul {
+  list-style: disc;
+}
+.doc-prose ol {
+  list-style: decimal;
+}
+.doc-prose blockquote {
+  margin: 1em 0;
+  border-inline-start: 1px solid var(--border-strong);
+  padding-inline-start: 1em;
+  color: var(--muted-foreground);
+}
+.doc-prose strong {
+  font-weight: 600;
+}
+.doc-prose hr {
+  margin: 1.6em 0;
+  border-color: var(--border);
+}
+
+.chat-prose {
+  font-size: 15px;
+  line-height: 28px;
+}
+.chat-prose > :last-child {
+  margin-bottom: 0;
+}
+.chat-prose :is(p, ul, ol) {
+  margin: 0.45em 0;
+}
+.chat-prose h1,
+.chat-prose h2,
+.chat-prose h3 {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  margin: 1em 0 0.35em;
+}
+.chat-prose :is(th, code, pre) {
+  background: var(--code);
+}
+
+/* Each paragraph takes its own direction from its first letter, so a document
+   that mixes Persian and English lines up both correctly. */
+.doc-prose :is(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote) {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+.doc-prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.doc-prose code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 22px;
+  background: var(--code);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+.doc-prose pre {
+  direction: ltr;
+  unicode-bidi: isolate;
+  margin: 1em 0;
+  overflow-x: auto;
+  background: var(--code);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  line-height: 22px;
+  font-size: 13px;
+}
+.doc-prose pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.doc-prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1em 0;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 24px;
+}
+.doc-prose th,
+.doc-prose td {
+  border: 1px solid var(--border);
+  padding: 0.4em 0.8em;
+  text-align: start;
+}
+.doc-prose th {
+  background: var(--code);
+  font-weight: 600;
+}
+.doc-prose h6 {
+  margin: 0 0 0.6em;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.doc-prose img {
+  max-width: 100%;
+}
+
+/* Diff marks used in approvals and skill suggestions */
+.diff-add {
+  background: var(--success-soft);
+  color: #bbf7d0;
+  border-radius: 4px;
+  padding: 0 3px;
+  text-decoration: none;
+}
+.diff-del {
+  background: var(--danger-soft);
+  color: #fecdd3;
+  border-radius: 4px;
+  padding: 0 3px;
+  text-decoration: line-through;
+}

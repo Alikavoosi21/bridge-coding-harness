@@ -1,0 +1,53 @@
+{
+  "status": "exported",
+  "exports_created": true,
+  "master_size": 256,
+  "preview_size": 128,
+  "fps": 20,
+  "background": "#010A04",
+  "brand": "#4ADE80",
+  "states": [
+    {
+      "id": "loading",
+      "trigger": "model_or_runtime_pending",
+      "duration_ms": 1600,
+      "loop": true,
+      "motion": "H breathes gently with three waiting dots; no simulated percentage",
+      "label": "در حال آماده‌سازی"
+    },
+    {
+      "id": "executing",
+      "trigger": "tool_running",
+      "duration_ms": 1200,
+      "loop": true,
+      "motion": "Full 3D turn of the H",
+      "label": "در حال اجرا"
+    },
+    {
+      "id": "approval",
+      "trigger": "awaiting_human",
+      "duration_ms": 2400,
+      "loop": true,
+      "motion": "H opens and morphs into two separated pause rails",
+      "label": "منتظر تأیید شما"
+    },
+    {
+      "id": "correcting",
+      "trigger": "repair_attempt_started",
+      "duration_ms": 1800,
+      "loop": true,
+      "motion": "Three H parts rotate apart then reconnect",
+      "label": "در حال اصلاح"
+    },
+    {
+      "id": "success",
+      "trigger": "required_checks_passed",
+      "duration_ms": 1000,
+      "loop": false,
+      "motion": "H morphs into a large check",
+      "label": "بررسی‌ها موفق بودند"
+    }
+  ],
+  "selected_logo": "bridge",
+  "revision": 2
+}

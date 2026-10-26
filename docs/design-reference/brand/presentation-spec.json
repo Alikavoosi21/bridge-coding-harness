@@ -1,0 +1,42 @@
+{
+  "brand": "Onboard Harness",
+  "tagline": "Local work. Deliberate handoff.",
+  "brief": "A local Windows coding harness for independent developers, with visible plans, scoped permissions, verification and human review.",
+  "adjectives": [
+    "precise",
+    "calm",
+    "independent",
+    "controlled"
+  ],
+  "criteria": "Readable H at 24px, simplified 16px favicon, one-colour form and a reusable motion signal.",
+  "industry": "developer-tools",
+  "brand_color": "#4ADE80",
+  "tile_color": "#010A04",
+  "greyscale": false,
+  "final": true,
+  "round": 2,
+  "concepts": [
+    {
+      "name": "Bridge",
+      "symbol": "bridge-symbol-brand.svg",
+      "lockup": "bridge-horizontal-ink.svg",
+      "stacked": "bridge-stacked.svg",
+      "avatar": "bridge-app-icon.svg",
+      "symbol_on_tile": "bridge-symbol-brand.svg",
+      "symbol_on_dark": "bridge-symbol-brand.svg",
+      "lockup_on_dark": "bridge-horizontal.svg",
+      "idea": "Two stable rails joined by one stepped transfer.",
+      "rationale": [
+        "The H identifies the harness without a terminal cliché.",
+        "The transfer path becomes the moving signal for task states.",
+        "Outline wordmark and filled-path symbol work without installed fonts."
+      ]
+    }
+  ],
+  "recommendation": "Bridge was selected by the user. Palette follows the supplied Vertex reference.",
+  "next_steps": [
+    "Integrate the selected assets into the desktop app after implementation review.",
+    "Use static posters when motion is reduced.",
+    "Trademark clearance is not included."
+  ]
+}

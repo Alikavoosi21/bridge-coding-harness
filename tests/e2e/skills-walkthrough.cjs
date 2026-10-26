@@ -1,0 +1,33 @@
+const fs=require('node:fs'),path=require('node:path');
+module.exports=async({page,fixture,api,origin,output,check})=>{
+ await page.goto(origin);await page.getByRole('button',{name:'رد کردن',exact:true}).click();
+ await page.goto(origin+'/customize');
+ await page.getByRole('button',{name:'کشف مهارت‌های پروژه',exact:true}).click();
+ await page.getByText('همراه محصول',{exact:true}).waitFor();
+ check('bundled source is identified',await page.getByText('همراه محصول',{exact:true}).count()===1);
+ await page.getByLabel('مسیر پوشهٔ دارای SKILL.md',{exact:true}).fill(fixture.skill_source);
+ await page.getByRole('combobox').selectOption('personal');
+ await page.getByRole('button',{name:'ثبت منبع غیرفعال',exact:true}).click();
+ const item=page.getByRole('listitem').filter({has:page.getByRole('heading',{name:'check-code',exact:true})});
+ await item.getByText('غیرفعال',{exact:true}).waitFor();
+ const listed=await fetch(api+'/skill-sources',{headers:{Authorization:'Bearer fixture-t008'}}).then(response=>response.json());
+ check('registry list does not send full bodies',listed.items.every(source=>!('body' in source)));
+ await page.getByRole('button',{name:'بازبینی check-code',exact:true}).click();
+ const dialog=page.getByRole('dialog');await dialog.getByText('PRIVATE SKILL INSTRUCTIONS FOR PREVIEW',{exact:true}).waitFor();
+ await dialog.evaluate(element=>Promise.all(element.getAnimations().map(animation=>animation.finished.catch(()=>{}))));
+ await page.screenshot({path:path.join(output,'P12-trust-preview.png')});
+ const enable=page.getByRole('button',{name:'فعال‌کردن نسخهٔ بازبینی‌شده',exact:true});
+ check('enable requires trust decision',await enable.isDisabled());
+ await dialog.getByRole('checkbox').check();await enable.click();
+ await dialog.waitFor({state:'hidden'});await item.getByText('فعال',{exact:true}).waitFor();
+ check('explicit trust enables registered source',await item.getByText('بازبینی‌شده',{exact:true}).count()===1);
+ fs.writeFileSync(path.join(fixture.skill_source,'helper.py'),'# changed script bytes','utf8');
+ await page.getByRole('button',{name:'بازخوانی منابع',exact:true}).click();
+ await item.getByText('منبع تغییر کرده',{exact:true}).waitFor();
+ for(const viewport of [{width:1440,height:900},{width:1024,height:640}]){await page.setViewportSize(viewport);await item.scrollIntoViewIfNeeded();await page.screenshot({path:path.join(output,`P12-${viewport.width}.png`)});check('skills fit '+viewport.width,await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth))}
+ await item.getByRole('button',{name:'غیرفعال‌سازی',exact:true}).click();await item.getByText('غیرفعال',{exact:true}).waitFor();
+ check('changed and disabled are both visible',await item.getByText('منبع تغییر کرده',{exact:true}).count()===1);
+ await item.getByRole('button',{name:'حذف ثبت منبع',exact:true}).click();await page.getByRole('button',{name:'تأیید حذف ثبت',exact:true}).click();
+ await item.waitFor({state:'hidden'});
+ check('forget preserves user source folder',fs.existsSync(path.join(fixture.skill_source,'SKILL.md')));
+};

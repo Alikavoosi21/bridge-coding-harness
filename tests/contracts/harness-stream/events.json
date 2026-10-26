@@ -1,0 +1,314 @@
+[
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 1,
+    "event_id": "evt_0001",
+    "type": "task_state_changed",
+    "occurred_at": 1.0,
+    "payload": {
+      "state": "executing",
+      "reason": "started"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 2,
+    "event_id": "evt_0002",
+    "type": "message_started",
+    "occurred_at": 2.0,
+    "payload": {
+      "message_id": "msg_1",
+      "part_id": "part_1"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 3,
+    "event_id": "evt_0003",
+    "type": "text_delta",
+    "occurred_at": 3.0,
+    "payload": {
+      "message_id": "msg_1",
+      "part_id": "part_1",
+      "offset": 0,
+      "delta": "سلام"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 4,
+    "event_id": "evt_0004",
+    "type": "text_delta",
+    "occurred_at": 4.0,
+    "payload": {
+      "message_id": "msg_1",
+      "part_id": "part_1",
+      "offset": 4,
+      "delta": " دنیا"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 5,
+    "event_id": "evt_0005",
+    "type": "text_delta",
+    "occurred_at": 5.0,
+    "payload": {
+      "message_id": "msg_1",
+      "part_id": "part_1",
+      "offset": 9,
+      "delta": " 🎉"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 6,
+    "event_id": "evt_0006",
+    "type": "message_finished",
+    "occurred_at": 6.0,
+    "payload": {
+      "message_id": "msg_1",
+      "part_id": "part_1",
+      "finish_reason": "stop"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 7,
+    "event_id": "evt_0007",
+    "type": "task_state_changed",
+    "occurred_at": 7.0,
+    "payload": {
+      "state": "awaiting_decision",
+      "reason": "plan needs approval"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 8,
+    "event_id": "evt_0008",
+    "type": "plan_updated",
+    "occurred_at": 8.0,
+    "payload": {
+      "revision": 2,
+      "steps": [
+        {
+          "id": "s1",
+          "title": "بررسی فایل‌ها",
+          "status": "done"
+        }
+      ],
+      "scope": [
+        "docs/report.md"
+      ],
+      "checks": [
+        "npm test"
+      ],
+      "approved_revision": null
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 9,
+    "event_id": "evt_0009",
+    "type": "approval_required",
+    "occurred_at": 9.0,
+    "payload": {
+      "approval_id": "ap_1",
+      "revision": 2,
+      "action_hash": "sha256:abc",
+      "tool": "write_file",
+      "summary": "نوشتن گزارش",
+      "scope": [
+        "docs/report.md"
+      ]
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 10,
+    "event_id": "evt_0010",
+    "type": "action_started",
+    "occurred_at": 10.0,
+    "payload": {
+      "operation_id": "op_1",
+      "action_id": "act_1",
+      "tool": "write_file",
+      "state": "running"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 11,
+    "event_id": "evt_0011",
+    "type": "action_finished",
+    "occurred_at": 11.0,
+    "payload": {
+      "operation_id": "op_1",
+      "action_id": "act_1",
+      "tool": "write_file",
+      "state": "succeeded",
+      "receipt": {
+        "operation_id": "op_1"
+      }
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 12,
+    "event_id": "evt_0012",
+    "type": "budget_updated",
+    "occurred_at": 12.0,
+    "payload": {
+      "revision": 3,
+      "active_ms": 1200,
+      "model_calls": 2,
+      "tool_calls": 1,
+      "max_active_ms": 600000,
+      "max_model_calls": 40,
+      "max_tool_calls": 80
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 13,
+    "event_id": "evt_0013",
+    "type": "lease_state_changed",
+    "occurred_at": 13.0,
+    "payload": {
+      "workspace_id": "ws_1",
+      "state": "active",
+      "fencing_token": 4,
+      "kind": "write",
+      "operation_id": "op_1"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 14,
+    "event_id": "evt_0014",
+    "type": "selection_quality_changed",
+    "occurred_at": 14.0,
+    "payload": {
+      "selection_id": "sel_1",
+      "quality_status": "not_verified",
+      "target_kind": "apply_candidate",
+      "candidate_manifest_hash": "sha256:def",
+      "check_refs": []
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 15,
+    "event_id": "evt_0015",
+    "type": "file_changed",
+    "occurred_at": 15.0,
+    "payload": {
+      "file_id": "f_1",
+      "path": "docs/report.md",
+      "change_kind": "modified",
+      "hash": "sha256:123",
+      "size": 42
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 16,
+    "event_id": "evt_0016",
+    "type": "verification_finished",
+    "occurred_at": 16.0,
+    "payload": {
+      "target_kind": "working_copy",
+      "outcome": "passed",
+      "check_refs": [
+        "npm test"
+      ]
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 17,
+    "event_id": "evt_0017",
+    "type": "repair_started",
+    "occurred_at": 17.0,
+    "payload": {
+      "repair_index": 1,
+      "reason": "test failed"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 18,
+    "event_id": "evt_0018",
+    "type": "apply_file_finished",
+    "occurred_at": 18.0,
+    "payload": {
+      "file_id": "f_1",
+      "state": "applied",
+      "operation_id": "apply_1"
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 19,
+    "event_id": "evt_0019",
+    "type": "recovery_required",
+    "occurred_at": 19.0,
+    "payload": {
+      "operation_id": "op_1",
+      "reason": "stop receipt unknown",
+      "reconcile_required": true
+    }
+  },
+  {
+    "schema_version": 1,
+    "task_id": "task_demo0000000001",
+    "run_id": "run_demo0000000001",
+    "sequence": 20,
+    "event_id": "evt_0020",
+    "type": "task_state_changed",
+    "occurred_at": 20.0,
+    "payload": {
+      "state": "closed",
+      "outcome": "completed"
+    }
+  }
+]

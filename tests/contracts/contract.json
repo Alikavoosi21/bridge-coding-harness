@@ -1,0 +1,128 @@
+{
+  "schema_version": 5,
+  "event_schema_version": 1,
+  "task_states": [
+    "draft",
+    "queued",
+    "planning",
+    "awaiting_plan",
+    "executing",
+    "awaiting_action",
+    "verifying",
+    "repairing",
+    "awaiting_decision",
+    "paused_limit",
+    "stopping",
+    "paused",
+    "recovery_required",
+    "closed",
+    "failed",
+    "cancelled"
+  ],
+  "run_states": [
+    "queued",
+    "active",
+    "paused",
+    "stopping",
+    "done",
+    "failed",
+    "unknown"
+  ],
+  "action_states": [
+    "pending",
+    "awaiting_approval",
+    "dispatching",
+    "running",
+    "succeeded",
+    "failed",
+    "denied",
+    "unknown"
+  ],
+  "lease_states": [
+    "active",
+    "released",
+    "expired",
+    "quarantined"
+  ],
+  "access_modes": [
+    "ask",
+    "grant",
+    "auto"
+  ],
+  "event_types": [
+    "message_started",
+    "text_delta",
+    "message_finished",
+    "plan_updated",
+    "approval_required",
+    "approval_decided",
+    "action_started",
+    "action_finished",
+    "budget_updated",
+    "lease_state_changed",
+    "selection_quality_changed",
+    "file_changed",
+    "verification_finished",
+    "repair_started",
+    "task_state_changed",
+    "apply_file_finished",
+    "recovery_required"
+  ],
+  "verification_targets": [
+    "working_copy",
+    "apply_candidate"
+  ],
+  "verification_outcomes": [
+    "passed",
+    "failed",
+    "skipped",
+    "not_configured",
+    "stopped",
+    "timed_out"
+  ],
+  "quality_statuses": [
+    "verified_snapshot",
+    "not_verified",
+    "stale",
+    "failed"
+  ],
+  "file_change_kinds": [
+    "added",
+    "modified",
+    "deleted",
+    "binary",
+    "unsupported"
+  ],
+  "error_codes": [
+    "invalid_request",
+    "unauthorized",
+    "forbidden",
+    "not_found",
+    "conflict",
+    "idempotency_conflict",
+    "request_in_progress",
+    "workspace_busy",
+    "selection_stale",
+    "lease_lost",
+    "budget_revision_mismatch",
+    "budget_exhausted",
+    "action_not_approved",
+    "runtime_unavailable",
+    "recovery_required",
+    "rate_limited",
+    "unavailable",
+    "error"
+  ],
+  "limits": {
+    "active_ms": 600000,
+    "model_calls": 40,
+    "tool_calls": 80,
+    "repairs_allowed": 2,
+    "command_timeout_s": 120,
+    "install_timeout_s": 600,
+    "output_bytes": 1000000,
+    "context_bytes": 65536,
+    "snapshot_bytes": 500000000,
+    "snapshot_files": 50000
+  }
+}

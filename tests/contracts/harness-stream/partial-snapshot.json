@@ -1,0 +1,18 @@
+{
+  "task_id": "task_demo0000000001",
+  "last_event_seq": 3,
+  "status": "executing",
+  "messages": [
+    {
+      "id": "msg_1",
+      "role": "assistant",
+      "parts": [
+        {
+          "id": "part_1",
+          "text": "سلام",
+          "state": "streaming"
+        }
+      ]
+    }
+  ]
+}
