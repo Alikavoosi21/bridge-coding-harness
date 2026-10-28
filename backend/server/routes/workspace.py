@@ -109,7 +109,7 @@ def _inside(workspace: Workspace, path: str) -> Path:
 def current(request: Request) -> dict[str, Any]:
     data = settings.load()
     path = data["current_workspace"]
-    known = [{"path": folder, "name": settings.workspace_name(data, folder)} for folder in data["workspaces"]]
+    known = [{"path": folder, "name": settings.workspace_name(data, folder)} for folder in sorted(data["workspaces"],key=lambda folder:folder!=path)]
     return {"path": path, "name": settings.workspace_name(data, path) if path else None, "known": known}
 
 

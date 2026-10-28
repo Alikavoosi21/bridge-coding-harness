@@ -143,7 +143,8 @@ def _require_write_capability(body: StartTask) -> None:
             status_code=409,
             details={"reason": reason, "model_id": model_id},
         )
-    capability = DockerRuntime().capability()
+    from harness.runtime.local import LocalRuntime
+    capability = LocalRuntime().capability()
     if not capability.available:
         raise ApiError(
             "runtime_unavailable",

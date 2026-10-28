@@ -53,22 +53,15 @@ def _use(monkeypatch, runtime: _FakeRuntime) -> _FakeRuntime:
     return runtime
 
 
-async def test_without_docker_the_readiness_says_read_only_and_names_the_reason(api, monkeypatch):
-    _use(monkeypatch, _FakeRuntime(available=False))
-
-    response = await api.get("/readiness")
-
-    assert response.status_code == 200
-    data = response.json()
-    assert data["engine"]["ok"] is True
-    assert data["schema"]["ok"] is True and data["schema"]["version"] == data["schema"]["expected"]
-    assert data["runtime"]["available"] is False
-    assert data["workspace"]["open"] is False
-    assert data["model"]["demo"] is True and data["model"]["tools"] is True
-    assert data["task"]["can_write"] is False and data["task"]["mode"] == "read_only"
-    assert data["legacy_runs"]["mode"] == "read_only"
-    assert {issue["component"] for issue in data["issues"]} == {"runtime", "workspace"}
-    assert {issue["code"] for issue in data["issues"]} == {"docker_missing", "workspace_closed"}
+async def test_without_docker_default_workspace_and_native_execution_are_ready(api, monkeypatch):
+    from server.routes import readiness
+    monkeypatch.setattr(readiness,'DockerRuntime',lambda: (_ for _ in ()).throw(AssertionError('Docker must not be queried')))
+    data=(await api.get('/readiness')).json()
+    assert data['runtime']['available'] and data['runtime']['kind']=='local'
+    assert data['runtime']['sandboxed'] is False
+    assert data['workspace']['open'] and data['task']['can_write']
+    assert data['legacy_runs']['mode']=='read_only'
+    assert data['issues']==[]
 
 
 async def test_a_ready_runtime_and_an_open_workspace_allow_a_sandbox_task(api, monkeypatch):
@@ -82,18 +75,15 @@ async def test_a_ready_runtime_and_an_open_workspace_allow_a_sandbox_task(api, m
     assert data["runtime"]["image_present"] is True
     assert data["worker"]["state"] == "idle"
     assert data["task"]["can_execute"] is True and data["task"]["can_write"] is True
-    assert data["task"]["mode"] == "sandbox"
+    assert data["task"]["mode"] == "local"
     assert data["issues"] == []
     assert data["legacy_runs"]["mode"] == "read_only", "readiness does not turn the legacy runner into a writer"
 
 
-async def test_a_missing_image_is_a_different_failure_from_missing_docker(api, monkeypatch):
-    _use(monkeypatch, _FakeRuntime(available=False, server_version="27.0.0"))
-
-    codes = {issue["code"] for issue in (await api.get("/readiness")).json()["issues"]}
-
-    assert "image_missing" in codes
-    assert "docker_missing" not in codes
+async def test_missing_docker_image_does_not_block_native_execution(api, monkeypatch):
+    _use(monkeypatch,_FakeRuntime(available=False,server_version='27.0.0'))
+    data=(await api.get('/readiness')).json()
+    assert data['runtime']['available'] and not data['issues']
 
 
 async def test_prepare_needs_consent_and_never_runs_without_it(api, monkeypatch):
@@ -112,8 +102,8 @@ async def test_prepare_builds_the_fixed_image_once_consent_is_given(api, monkeyp
     response = await api.post("/runtime/prepare", json={"consent": True})
 
     assert response.status_code == 200
-    assert runtime.built == ["python:3.12-slim-bookworm"]
-    assert response.json()["build"]["built"] is True
+    assert runtime.built == []
+    assert response.json()["runtime"]["available"] is True
 
 
 async def test_prepare_reports_missing_docker_as_unavailable_not_a_crash(api, monkeypatch):
@@ -121,9 +111,8 @@ async def test_prepare_reports_missing_docker_as_unavailable_not_a_crash(api, mo
 
     response = await api.post("/runtime/prepare", json={"consent": True})
 
-    assert response.status_code == 503
-    assert response.json()["code"] == "runtime_unavailable"
-    assert response.json()["retryable"] is True
+    assert response.status_code == 200
+    assert response.json()["runtime"]["available"] is True
 
 
 async def test_readiness_contains_no_key_no_token_and_no_private_path(api, monkeypatch, tmp_path):

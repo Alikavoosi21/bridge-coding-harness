@@ -37,7 +37,7 @@ type AccessMode = 'ask' | 'grant' | 'auto';
 const accessModes: { value: AccessMode; label: string; hint: string }[] = [
   { value: 'ask', label: 'با تأیید', hint: 'هر تغییر فایل و هر فرمان را پیش از اجرا بررسی می‌کنید.' },
   { value: 'grant', label: 'مجوز برای همین کار', hint: 'فقط مجوزهای مشخصی که تأیید می‌کنید تا پایان همین کار می‌مانند.' },
-  { value: 'auto', label: 'خودکار در محیط ایزوله', hint: 'پس از تأیید برنامه، ویرایش و فرمان آفلاین خودکار است؛ شبکه و نصب جدا تصمیم می‌گیرند.' },
+  { value: 'auto', label: 'خودکار در فضای گفتگو', hint: 'پس از تأیید برنامه، ویرایش و فرمان محلی خودکار است؛ شبکه و نصب جدا تصمیم می‌گیرند.' },
 ];
 
 const suggestions = [
@@ -57,7 +57,7 @@ function relative(seconds: number | null | undefined): string {
 
 function readableError(error: unknown): string {
   if (error instanceof HarnessRequestError) {
-    if (error.code === 'runtime_unavailable') return 'محیط ایزوله در دسترس نیست؛ تغییر فایل ممکن نیست. کار را فقط خواندنی شروع کنید یا محیط را در تنظیمات بررسی کنید.';
+    if (error.code === 'runtime_unavailable') return 'محیط محلی در دسترس نیست؛ تغییر فایل ممکن نیست. کار را فقط خواندنی شروع کنید یا محیط را در تنظیمات بررسی کنید.';
     if (error.code === 'model_tools_unavailable') return 'این مدل توان اجرای ابزار را تأیید نکرده است؛ کار را فقط خواندنی شروع کنید یا در تنظیمات مدل دیگری انتخاب کنید.';
     if (error.code === 'conflict' && error.details.reason === 'no_workspace') return 'اول یک پروژه باز کنید.';
     if (error.code === 'invalid_request') {
@@ -209,7 +209,7 @@ export function Home() {
             </span>
             <ReadinessDot
               ok={readiness?.runtime.available === true}
-              label={readinessLoading?'در حال بررسی محیط…':readiness?.runtime.available === true ? 'محیط ایزوله آماده است' : 'محیط اجرا آماده نیست'}
+              label={readinessLoading?'در حال بررسی محیط…':readiness?.runtime.available === true ? 'محیط محلی آماده است' : 'محیط اجرا آماده نیست'}
             />
             <ReadinessDot
               ok={readiness?.model.configured === true}
@@ -283,7 +283,7 @@ export function Home() {
                     'cursor-pointer gap-2',
                     !canWrite && 'cursor-not-allowed opacity-60',
                   )}
-                  title={canWrite ? 'با خاموش‌کردن فقط خواندن، تغییر فایل ممکن می‌شود' : 'بدون مدل اثبات‌شده و محیط ایزوله، فقط خواندن ممکن است'}
+                  title={canWrite ? 'با خاموش‌کردن فقط خواندن، تغییر فایل ممکن می‌شود' : 'بدون مدل اثبات‌شده و محیط محلی، فقط خواندن ممکن است'}
                 >
                   <EyeIcon />
                   فقط خواندن

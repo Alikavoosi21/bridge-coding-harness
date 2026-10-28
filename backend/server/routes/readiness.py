@@ -54,9 +54,11 @@ def _schema() -> tuple[dict[str, Any], dict[str, Any] | None]:
 
 
 def _runtime() -> tuple[dict[str, Any], dict[str, Any] | None]:
-    capability = DockerRuntime().capability()
+    from harness.runtime.local import LocalRuntime
+    capability = LocalRuntime().capability()
     payload = capability.as_dict()
-    payload["dockerfile"] = str(DOCKERFILE)
+    payload['kind']='local'
+    payload['sandboxed']=False
     if capability.available:
         return payload, None
     if capability.server_version is None:
@@ -135,7 +137,7 @@ def readiness(request: Request) -> dict[str, Any]:
     # actually confirmed tool calls. The legacy runner remains read-only.
     can_write = base_ready and bool(runtime.get("available")) and model.get("tools") is True
     if can_write:
-        reason = "The sandbox is ready."
+        reason = "Local task files and execution are ready; Docker is not required."
     elif not workspace.get("open"):
         reason = "No workspace is open. Choose a project folder first."
     elif not model.get("configured") or not model.get("has_key"):
@@ -157,7 +159,7 @@ def readiness(request: Request) -> dict[str, Any]:
             "can_chat": can_chat,
             "can_execute": can_write,
             "can_write": can_write,
-            "mode": "sandbox" if can_write else "read_only",
+            "mode": "local" if can_write else "read_only",
             "reason": reason,
         },
         # The legacy runner is deliberately honest: even a ready runtime does
@@ -172,9 +174,6 @@ def prepare_runtime(body: PrepareRuntime) -> dict[str, Any]:
     """Build the sandbox image after explicit consent. The command is fixed."""
     if not body.consent:
         raise ApiError("consent_required", "Building the sandbox image needs your explicit consent.", status_code=400)
-    runtime = DockerRuntime()
-    try:
-        result = runtime.build_image(DEFAULT_BASE_IMAGE)
-    except RuntimeUnavailable as error:
-        raise ApiError("runtime_unavailable", str(error), status_code=503, retryable=True) from error
-    return {"runtime": runtime.capability().as_dict(), "build": result}
+    from harness.runtime.local import LocalRuntime
+    runtime=LocalRuntime()
+    return {'runtime':runtime.capability().as_dict(),'build':{'built':False,'output':'ابزارهای اجرا همراه برنامه‌اند؛ نیازی به ساخت محیط Docker نیست.'}}

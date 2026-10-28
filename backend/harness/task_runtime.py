@@ -115,11 +115,20 @@ def open_task_runtime(workspace: Workspace, store, task_id: str, *, read_only: b
             backend=CompositeBackend(default=ReadOnlyBackend(root_dir=working,virtual_mode=True),routes={f'/.harness/{name}/':ReadOnlyBackend(root_dir=root/'knowledge'/name,virtual_mode=True) for name in ('skills','memory')})
             return TaskRuntime(backend,data_workspace,'read-only',store,task,worker)
         old=runtime_descriptor(store,task_id)
-        runtime=runtime or DockerRuntime(ContainerConfig(image=old['image']) if old else None)
+        from .runtime.local import runtime_for
+        runtime=runtime or runtime_for(old)
         identifier=runtime.pin_image()
         runtime_id=hashlib.sha256(json.dumps(asdict(runtime.config),sort_keys=True).encode()).hexdigest()
         descriptor={'image':identifier,'runtime_id':runtime_id}
-        if old and old!=descriptor:raise RuntimeUnavailable('The task runtime changed; a fresh review is required.')
+        if old and old!=descriptor:
+            if getattr(runtime,'local',False) and not str(old['image']).startswith('bridge-local'):
+                with store.db.write() as db:
+                    db.execute('UPDATE plans SET approved_revision=NULL WHERE task_id=?',(task_id,))
+                    db.execute('UPDATE grants SET revoked_at=? WHERE task_id=? AND revoked_at IS NULL',(__import__('time').time(),task_id))
+                temporary=root/'runtime.tmp';temporary.write_text(json.dumps(descriptor),encoding='utf8');temporary.replace(root/'runtime.json')
+                store.set_task_status(task_id,'awaiting_plan',reason='local_runtime_requires_approval')
+                raise RuntimeUnavailable('محیط این گفتگو به اجرای محلی تغییر کرد؛ برنامه را دوباره تأیید کن. فایل‌ها حفظ شدند.')
+            raise RuntimeUnavailable('The task runtime changed; a fresh review is required.')
         root.mkdir(parents=True,exist_ok=True)
         temporary=root/'runtime.tmp';temporary.write_text(json.dumps(descriptor),encoding='utf8');temporary.replace(root/'runtime.json')
         writer=store.acquire_workspace_lease(task['workspace_id'],task_id,'execute',ttl_s=max_seconds+60)

@@ -100,10 +100,11 @@ def build_agent(workspace: Workspace, request: RunRequest, tracker: RunTracker, 
     if request.rubric:
         middleware.append(RubricMiddleware(model=model))  # grade the answer before finishing
 
+    local_note='\nExecution runs locally on Windows with cmd.exe in this task copy. File tools use virtual / paths. Use Windows-compatible commands; no bash, sh, /bin or Unix-only shell syntax. Commands have the user Windows permissions and networking; do not describe this as an OS sandbox. Use python and node/npm supplied by Bridge. For self-contained UI requests prefer index.html with inline CSS/JS so Preview works immediately without package installation. Write requested files using write_file/edit_file; do not ask the user to copy code elsewhere. Web servers must listen on HOST (default 127.0.0.1) and PORT from the environment; do not hardcode a port.\n' if gateway and getattr(getattr(getattr(backend,'default',backend),'_runtime',None),'local',False) else ''
     return create_deep_agent(
         name="harness",
         model=model,
-        system_prompt=SYSTEM_PROMPT + (f"\n## Your role in this task\n{lead.prompt}" if lead else ""),
+        system_prompt=SYSTEM_PROMPT + local_note + (f"\n## Your role in this task\n{lead.prompt}" if lead else ""),
         tools=tools,
         backend=backend,
         interrupt_on=gateway.interrupt_on(set(all_tools) | {'read_file','write_file','edit_file','ls','glob','grep','execute','task','write_todos'}) if gateway else policy.interrupt_on(),

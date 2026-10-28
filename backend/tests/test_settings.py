@@ -48,7 +48,8 @@ class _FakeRuntime:
 
 def _use_runtime(monkeypatch, available: bool = True) -> None:
     runtime = _FakeRuntime(available=available)
-    monkeypatch.setattr(readiness_routes, "DockerRuntime", lambda: runtime)
+    import harness.runtime.local as local
+    monkeypatch.setattr(local, "LocalRuntime", lambda: runtime)
     monkeypatch.setattr(task_routes, "DockerRuntime", lambda: runtime)
 
 
@@ -187,9 +188,9 @@ async def test_a_proven_model_and_available_runtime_allow_a_write_task(api, monk
 async def test_setup_needs_a_workspace_and_a_model_before_it_can_complete(api):
     response = await api.put("/settings", json={"setup": {"step": 4, "completed": True}})
 
-    assert response.status_code == 409
-    assert response.json()["code"] == "setup_incomplete"
-    assert response.json()["details"]["missing"] == ["workspace"]
+    assert response.status_code == 200
+    assert response.json()['workspace']['open'] is True
+    assert response.json()['setup']['completed'] is True
 
 
 async def test_completion_is_explicit_and_saving_a_profile_does_not_confirm_a_first_run(api):

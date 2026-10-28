@@ -70,6 +70,12 @@ class PlanGate:
         if plan is None:
             self.store.save_plan(self.task_id, steps=todos)
             return
+        if plan.get('approved_revision')==plan.get('revision') and len(todos)==len(plan['steps']):
+            import unicodedata
+            def label(value):return ''.join(unicodedata.normalize('NFKC',str(value)).replace('\u200c','').split())
+            if all(isinstance(todo,dict) and label(todo.get('content',todo.get('title','')))==label(step['title']) for todo,step in zip(todos,plan['steps'])):
+                # Typography-only progress updates must not revoke a real approval.
+                todos=[{**todo,'content':step['title'],'title':step['title']} for todo,step in zip(todos,plan['steps'])]
         try:
             profile_hash=plan['profile_hash']
             if plan.get('approved_revision') is None and hasattr(self.store,'task') and hasattr(self.store,'workspace'):

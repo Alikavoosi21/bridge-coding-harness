@@ -25,12 +25,13 @@ from harness.verification.results import CheckResults
 from harness.verification.observe import current_quality
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / 'checks/phase-2/real-provider.json'
+LOCAL = os.environ.get('BRIDGE_ACCEPT_LOCAL')=='1'
+OUTPUT = ROOT / ('checks/local-real-provider.json' if LOCAL else 'checks/phase-2/real-provider.json')
 
 
 async def main():
     spec = settings.model_spec(None)
-    report = {'passed': False, 'scope': 'Real configured provider + Deep Agents/LangGraph + Docker; disposable Python project', 'checks': []}
+    report = {'passed': False, 'scope': 'Real configured provider + Deep Agents/LangGraph + '+('local execution' if LOCAL else 'Docker')+'; disposable Python project', 'checks': []}
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
 
     def check(name, value):
@@ -45,7 +46,10 @@ async def main():
         report['model'] = spec.model  # no endpoint or credential in the deliverable
         capability = await probe_model(spec, timeout=40)
         check('real provider tool-call probe', capability['demo'] is False and capability['tools'] is True)
-        check('real Docker runtime available', DockerRuntime().capability().available)
+        if LOCAL:
+            from harness.runtime.local import LocalRuntime
+            check('native runtime ready without Docker',LocalRuntime().capability().available)
+        else:check('real Docker runtime available', DockerRuntime().capability().available)
         temporary = Path(tempfile.mkdtemp(prefix='provider-', dir=ROOT / '.test-runs'))
         # Captured spec stays in memory; only the fixture's product state moves.
         os.environ['HARNESS_HOME'] = str(temporary / 'home')

@@ -51,10 +51,10 @@ async def test_defer_survives_restart_without_marking_setup_complete(tmp_path,mo
         assert response.status_code==200
         assert response.json()['setup']['deferred']
         assert response.json()['setup']['completed'] is False
-        assert not response.json()['workspace']['open']
-        assert (await client.get('/readiness')).json()['task']['can_write'] is False
-        assert (await client.put('/settings',json={'setup':{'completed':True}})).status_code==409
-    assert settings.load()['setup']['deferred']
+        assert response.json()['workspace']['open']
+        assert (await client.get('/readiness')).json()['task']['can_write'] is True
+        assert (await client.put('/settings',json={'setup':{'completed':True}})).status_code==200
+    assert settings.load()['setup']['completed']
     assert settings.load()['setup']['acknowledgements']=={key:False for key in ('model_api','sandbox_network','demo_state','read_only')}
 
 

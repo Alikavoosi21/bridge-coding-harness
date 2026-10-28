@@ -16,6 +16,7 @@ from urllib.parse import unquote,urlsplit
 from server.errors import ApiError
 from .preflight import analyze_workspace
 from .runtime.docker import DockerRuntime,RuntimeUnavailable,build_run_args
+from .runtime.local import LocalRuntime
 from .task_runtime import task_directory
 from .worktrees.diff import changes,review_context
 from .worktrees.guard import locked_copy
@@ -55,7 +56,7 @@ def output_info(store,task_id):
 
 
 class OutputSessions:
-    def __init__(self,runtime_factory=DockerRuntime):
+    def __init__(self,runtime_factory=LocalRuntime):
         self.sessions={};self.runtime_factory=runtime_factory;self.lock=threading.RLock();self.closing=False
         atexit.register(self.close_all)
 
@@ -143,6 +144,8 @@ class OutputSessions:
 
     def _run(self,s,port):
         runtime=s['runtime'];root=s['directory']/'project'
+        if getattr(runtime,'local',False):
+            return self._run_local(s,port)
         try:
             if s['install_command']:
                 s['state']='installing';self._save(s)
@@ -194,13 +197,19 @@ class OutputSessions:
     def get(self,task_id,identifier):
         s=self.sessions.get(identifier)
         if not s or s['task_id']!=task_id:raise ApiError('not_found','اجرای خروجی پیدا نشد؛ بعد از بازشدن مجدد برنامه دوباره اجرا کن.',status_code=404)
-        if s['kind']=='server' and s['state']=='ready' and time.monotonic()-s['last_poll']>2:
+        if s['kind']=='server' and s['state']=='ready' and getattr(s['runtime'],'local',False):
+            s['output']=s['runtime'].output(s['id'],64000)
+            entry=s['runtime'].processes.get(s['id'])
+            if not entry or entry['process'].poll() is not None:s.update(state='finished',url=None)
+        elif s['kind']=='server' and s['state']=='ready' and time.monotonic()-s['last_poll']>2:
             s['last_poll']=time.monotonic()
             try:s['output']=self._docker(s,['logs','--tail','150',s['container']])[-64000:]
             except RuntimeUnavailable as error:s.update(state='failed',url=None,output=str(error));self._cleanup(s)
         return self.public(s)
 
     def _cleanup(self,s):
+        if getattr(s['runtime'],'local',False):
+            return s['runtime'].cancel(s['id']) and s['runtime'].cancel(s['id']+'-install')
         if s['runtime']:
             for suffix in ('','-install'):
                 try:self._docker(s,['rm','--force','harness-'+s['id']+suffix],timeout=3)
@@ -223,7 +232,7 @@ class OutputSessions:
         if thread and thread.is_alive() and thread is not threading.current_thread():thread.join(timeout=1)
         confirmed=True
         if s['runtime']:
-            try:confirmed=not self._docker(s,['ps','-a','--filter','name=^harness-'+s['id']+'(-install)?$','--format','{{.ID}}'])
+            try:confirmed=self._cleanup(s) if getattr(s['runtime'],'local',False) else not self._docker(s,['ps','-a','--filter','name=^harness-'+s['id']+'(-install)?$','--format','{{.ID}}'])
             except Exception:confirmed=False
         s.update(state='stopping' if thread and thread.is_alive() else 'stopped' if confirmed else 'unknown',url=None);self._save(s);return self.public(s)
 
@@ -234,3 +243,39 @@ class OutputSessions:
                 try:self.stop(s['task_id'],s['id'])
                 except Exception:pass
         self.closing=False
+
+    def _run_local(self,s,port):
+        import socket
+        runtime=s['runtime'];root=s['directory']/'project'
+        try:
+            if s['install_command']:
+                s['state']='installing';self._save(s)
+                result=runtime.execute(s['install_command'],snapshot=root,exec_id=s['id']+'-install',timeout=300)
+                s['output']=result.output[-64000:]
+                if result.exit_code:raise RuntimeUnavailable('نصب موفق نشد.\n'+s['output'])
+            if s['stop'].is_set():return
+            s['state']='running';self._save(s)
+            if s['kind']=='command':
+                result=runtime.execute(s['command'],snapshot=root,exec_id=s['id'],timeout=120)
+                s.update(state='stopped' if result.stopped else 'failed' if result.exit_code else 'finished',exit_code=result.exit_code,output=result.output[-64000:])
+            else:
+                with socket.socket() as probe:probe.bind(('127.0.0.1',0));chosen=probe.getsockname()[1]
+                command=s['command']
+                if command.endswith(' -- --hostname 0.0.0.0 --port 3000'):command=command.replace(' -- --hostname 0.0.0.0 --port 3000',f' -- --hostname 127.0.0.1 --port {chosen}')
+                elif command.endswith(' -- --host 0.0.0.0 --port 3000'):command=command.replace(' -- --host 0.0.0.0 --port 3000',f' -- --host 127.0.0.1 --port {chosen}')
+                # A fresh port prevents displaying an unrelated process already on 3000.
+                entry=runtime.start(command,snapshot=root,exec_id=s['id'],extra={'PORT':str(chosen),'HOST':'127.0.0.1','FLASK_RUN_PORT':str(chosen)})
+                deadline=time.monotonic()+45
+                while not s['stop'].is_set() and time.monotonic()<deadline:
+                    if entry['process'].poll() is not None:raise RuntimeUnavailable(runtime.output(s['id']) or 'توقف سرور پیش از آماده‌شدن')
+                    try:
+                        connection=http.client.HTTPConnection('127.0.0.1',chosen,timeout=1);connection.request('GET','/');response=connection.getresponse();response.read(1024);connection.close()
+                        if response.status<500:break
+                    except OSError:pass
+                    time.sleep(.15)
+                else:raise RuntimeUnavailable('برنامه در مهلت آماده نشد؛ خروجی اجرا را بررسی کن.')
+                if s['stop'].is_set():return
+                s.update(state='ready',url=f'http://127.0.0.1:{chosen}/',output=runtime.output(s['id'],64000))
+        except Exception as error:
+            s.update(state='stopped' if s['stop'].is_set() else 'failed',url=None,output=(str(error)+'\n'+runtime.output(s['id'],64000))[-64000:]);self._cleanup(s)
+        finally:self._save(s)

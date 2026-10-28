@@ -8,7 +8,7 @@ import { useBackend } from '@/lib/backend';
 import { api, ApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
-const SEEN_KEY = 'bridge-coding-intro-v2';
+const SEEN_KEY = 'bridge-coding-intro-v3';
 export function onboardingSeen() {
   try { return localStorage.getItem(SEEN_KEY) === '1'; } catch { return false; }
 }
@@ -32,7 +32,7 @@ const steps = [
     lead: 'هر تسک یک مسیر روشن دارد. گفتگو، فعالیت، برنامه و بازبینی کد در همان میز کار کنار هم‌اند.',
     body: <ol className="space-y-5">
       <Point icon={ListChecksIcon} title="۱. بررسی و تأیید برنامه">پیش از تغییر، گام‌ها و محدودهٔ فایل‌ها را بررسی و در صورت نیاز اصلاح می‌کنی.</Point>
-      <Point icon={TerminalIcon} title="۲. اجرا و اصلاح در محیط جدا">ویرایش، فرمان و تست در نسخهٔ کاری و Docker انجام می‌شوند. بعد از دو اصلاح ناموفق، ادامه به تصمیم تو نیاز دارد.</Point>
+      <Point icon={TerminalIcon} title="۲. اجرا و اصلاح در محیط جدا">فایل‌ها در فضای همین گفتگو ساخته می‌شوند؛ اجرا و تست با ابزارهای همراه خود اپ انجام می‌شوند. بعد از دو اصلاح ناموفق، ادامه به تصمیم تو نیاز دارد.</Point>
       <Point icon={CheckCircleIcon} title="۳. بازبینی و اعمال">diff و خروجی واقعی تست را می‌بینی، دستی ویرایش می‌کنی و انتخاب می‌کنی کدام تغییر روی پروژهٔ اصلی اعمال شود.</Point>
     </ol>,
   },
@@ -42,9 +42,9 @@ const steps = [
     body: <div className="space-y-5"><ul className="space-y-4">
       <Point icon={FolderOpenIcon} title="پروژه">پوشهٔ مخزن کد را انتخاب کن. برای شروع می‌توانی از نمونهٔ python-bug همراه سورس استفاده کنی.</Point>
       <Point icon={KeyIcon} title="مدل">نشانی سرویس، نام مدل و کلید API را در گام مدل وارد کن؛ مدل ذخیره‌شده را بررسی و پیش‌فرض کن. حساب همین چت خودکار به Bridge وصل نمی‌شود.</Point>
-      <Point icon={TerminalIcon} title="محیط و فرمان‌ها">آمادگی Docker و فرمان‌های پیشنهادی تست و build را بررسی کن. ذخیرهٔ فرمان به معنی اجرای آن نیست.</Point>
+      <Point icon={TerminalIcon} title="محیط و فرمان‌ها">Python و Node همراه برنامه‌اند؛ چیزی نصب نکن. برای دیدن نتیجه «اجرا و نمایش» را بزن.</Point>
       <Point icon={ShieldCheckIcon} title="بازبینی راه‌اندازی">مدل، پروژه و دسترسی‌ها را مرور کن و خودت پایان راه‌اندازی را تأیید کن.</Point>
-    </ul><p className="bg-primary-soft text-primary rounded-lg p-4 text-xs leading-7">بدون کلید هم می‌توانی روند را با مدل نمایشی ببینی؛ demo کدنویسی با مدل واقعی نیست. بدون Docker، اجرا فقط‌خواندنی می‌ماند.</p></div>,
+    </ul><p className="bg-primary-soft text-primary rounded-lg p-4 text-xs leading-7">بدون کلید هم می‌توانی روند را با مدل نمایشی ببینی؛ demo کدنویسی با مدل واقعی نیست. انتخاب پوشه اختیاری است؛ Bridge خودش فضای ساخت را آماده می‌کند. فرمان محلی دسترسی حساب ویندوز تو را دارد.</p></div>,
   },
 ];
 export function Onboarding({ onDone }: { onDone: () => void }) {

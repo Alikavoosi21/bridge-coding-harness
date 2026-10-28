@@ -55,7 +55,7 @@ def changed_inputs_reviewed(store,task_id,root,profile,runtime) -> bool:
         for receipt in receipts:
             saved=json.loads(receipt['request_json'] or 'null')
             if not saved or saved['tool']!='execute' or saved['args'].get('command')!=command:continue
-            if saved['runtime']!=runtime or saved['environment_profile']!='offline:'+profile['profile_hash'] or saved['plan_revision']!=plan['revision']:continue
+            if saved['runtime']!=runtime or saved['environment_profile'] not in {'offline:'+profile['profile_hash'],'local:'+profile['profile_hash']} or saved['plan_revision']!=plan['revision']:continue
             script=command_details({'name':'execute','args':saved['args']},profile,root)[2]
             context=ActionContext('execute',saved['args'],saved['cwd'],saved['shell'],runtime,saved['environment_profile'],plan['revision'],script=script)
             if context.fingerprint()==receipt['action_hash']:matched=True;break

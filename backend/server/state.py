@@ -54,6 +54,8 @@ class AppState:
                 self.open(current)
             except (HTTPException, OSError):
                 pass  # the folder is gone (moved, unplugged drive): start with no workspace open
+        if self._manager is None:
+            self.open(str(settings.home()/'projects'/'scratch'),'فضای ساخت برنامه')
 
     def open(self, path: str, name: str | None = None) -> Workspace:
         """Open (and, the first time, set up) a workspace folder. `name` is what the user calls it."""

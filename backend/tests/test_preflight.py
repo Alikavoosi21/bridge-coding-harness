@@ -216,5 +216,5 @@ async def test_workspaces_list_exposes_the_product_id_and_is_idempotent(api):
 async def test_preflight_requires_an_open_workspace(api):
     response = await api.post("/setup/preflight")
 
-    assert response.status_code == 409
-    assert response.json()["code"] == "workspace_closed"
+    assert response.status_code == 200
+    assert response.json()["profile"]["executed"] is False

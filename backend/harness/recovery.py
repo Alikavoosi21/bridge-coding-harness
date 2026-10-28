@@ -67,7 +67,8 @@ def stop_orphans(store,task_id,*,confirm=False,runtime_factory=None):
     task=store.task(task_id)
     ids=[] if task['read_only'] else [row['runtime_exec_id'] or row['operation_id'] for row in state['actions'] if row['runtime_exec_id'] or not row['invocation_key'].startswith(('manual-edit:','restore:','skill-repin:'))]
     if ids:
-        result=(runtime_factory or DockerRuntime)().reconcile(ids)
+        from .runtime.local import LocalRuntime
+        result=(runtime_factory or LocalRuntime)().reconcile(ids)
         if result['unresolved']:raise ApiError('runtime_unavailable','Previous container termination could not be confirmed; nothing was replayed.',status_code=409)
     with store.db.write() as db:
         # Workspace remains quarantined until its bytes are reviewed, but a

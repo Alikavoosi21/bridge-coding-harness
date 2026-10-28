@@ -78,7 +78,8 @@ def run_candidate_checks(store,task_id,selection_id,*,key,approved_commands,appr
             install,_verifier,_source=command_details({'name':'execute','args':{'command':command['command']}},profile,capture)
             if install:raise ApiError('action_not_approved','Package installation needs a separate explicit approval.',status_code=409)
         descriptor=runtime_descriptor(store,task_id)
-        runtime=(runtime_factory or DockerRuntime)(ContainerConfig(image=descriptor['image']))
+        from ..runtime.local import runtime_for
+        runtime=runtime_factory(ContainerConfig(image=descriptor['image'])) if runtime_factory else runtime_for(descriptor)
         runtime.set_lease(held['lease'])
         try:image=runtime.pin_image()
         except RuntimeUnavailable as error:raise ApiError('runtime_unavailable',str(error),status_code=409) from error

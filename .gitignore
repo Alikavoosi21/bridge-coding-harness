@@ -18,6 +18,7 @@ release
 backend/build-engine
 .test-runs
 backend/.test-runs
+build/toolchain/
 
 # Local runtime state, recordings and credentials must never be published.
 checks/

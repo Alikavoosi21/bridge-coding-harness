@@ -255,7 +255,7 @@ export function EnvironmentStep({
       <div className="border-t pt-5">
         <div className="mb-2 flex items-center gap-2">
           <FileTextIcon className="text-muted-foreground size-4" />
-          <div className="text-sm font-semibold">سندباکس و image</div>
+          <div className="text-sm font-semibold">ابزار اجرای داخلی</div>
         </div>
         <RuntimeCard readiness={readiness} onChanged={refreshAll} />
       </div>

@@ -93,5 +93,6 @@ test('all four disclosures exist with user-visible text and no hidden extra perm
     assert.ok(flow.disclosureText[key].title.length > 0);
     assert.ok(flow.disclosureText[key].body.length > 0);
   }
-  assert.match(flow.disclosureText.sandbox_network.body, /--network none/);
+  assert.match(flow.disclosureText.sandbox_network.body, /دسترسی حساب ویندوز/);
+  assert.match(flow.disclosureText.sandbox_network.body, /sandbox سیستم‌عامل نیست/);
 });

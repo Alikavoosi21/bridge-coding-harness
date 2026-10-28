@@ -71,7 +71,7 @@ async def test_api_requires_explicit_command_and_install_consent(fixture):
 async def test_real_docker_executes_output_and_publishes_only_loopback(fixture,kind,command):
     capability=DockerRuntime().capability()
     if not capability.available:pytest.skip(capability.reason)
-    store,task,workspace,directory=fixture;manager=OutputSessions()
+    store,task,workspace,directory=fixture;manager=OutputSessions(runtime_factory=DockerRuntime)
     try:
         result=manager.start(store,task['id'],**payload(store,task,kind,command=command,network_consent=kind=='server'))
         for _ in range(150):

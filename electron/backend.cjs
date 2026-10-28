@@ -9,7 +9,6 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
-const {dockerEnvironment}=require('./docker-path.cjs');
 
 let child = null;
 const connection = { url: '', token: '' };
@@ -53,7 +52,7 @@ async function start() {
   const log = fs.openSync(logFile, 'a');
   child = spawn(file, args, {
     cwd,
-    env: { ...dockerEnvironment(), HARNESS_PORT: String(port), HARNESS_TOKEN: connection.token, PYTHONIOENCODING: 'utf-8', PYTHONUNBUFFERED: '1' },
+    env: { ...process.env, BRIDGE_TOOLCHAIN:app.isPackaged?path.join(process.resourcesPath,'toolchain'):path.join(__dirname,'../build/toolchain'), HARNESS_PORT: String(port), HARNESS_TOKEN: connection.token, PYTHONIOENCODING: 'utf-8', PYTHONUNBUFFERED: '1' },
     stdio: ['ignore', log, log],
     windowsHide: true,
   });

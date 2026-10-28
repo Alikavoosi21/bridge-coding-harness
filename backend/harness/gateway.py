@@ -44,6 +44,8 @@ class ToolGateway:
         from .network_access import current as network_permission
         network=network_permission(self.store,self.task_id) if call['name']=='execute' else None
         environment=('network:'+network['fingerprint'] if network else 'offline')+(':'+profile['profile_hash'] if profile.get('profile_hash') else '')
+        if getattr(getattr(self.backend,'_runtime',None),'local',False):
+            environment='local:'+str(profile.get('profile_hash') or '')
         context = ActionContext(call['name'], call.get('args') or {}, self.cwd, self.shell, self.runtime_id, environment, plan['revision'] if plan else 0,script=script)
         rules = build_policy(load_rules(self.rules_file), 'ask')
         from .permissions import WRITE_TOOLS,target_path

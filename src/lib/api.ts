@@ -189,7 +189,7 @@ export type Readiness = {
     capability_error?: string | null;
   };
   workspace: { open: boolean; name: string | null };
-  task: { can_chat: boolean; can_execute: boolean; can_write: boolean; mode: 'sandbox' | 'read_only'; reason: string };
+  task: { can_chat: boolean; can_execute: boolean; can_write: boolean; mode: 'sandbox' | 'local' | 'read_only'; reason: string };
   legacy_runs: { mode: string; reason: string };
   issues: ReadinessIssue[];
 };

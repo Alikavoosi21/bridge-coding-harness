@@ -30,6 +30,7 @@ function newest(target) {
 const backend = path.join(root, 'backend');
 const engine = path.join(backend, 'dist', 'harness-server', 'harness-server.exe');
 const sources = ['harness', 'server', 'run_server.py', 'pyproject.toml', 'uv.lock'].map((name) => path.join(backend, name));
+if(!fs.existsSync(path.join(root,'build/toolchain/python/python.exe')))run(process.execPath,[path.join(__dirname,'build-toolchain.cjs')]);
 // The engine is rebuilt when it is missing, when asked for, or when its source changed after it was
 // frozen: an installer with a new screen and an old engine fails in ways that are hard to recognise.
 const stale = fs.existsSync(engine) && Math.max(...sources.map(newest), newest(path.join(__dirname, 'build-engine.cjs'))) > fs.statSync(engine).mtimeMs;

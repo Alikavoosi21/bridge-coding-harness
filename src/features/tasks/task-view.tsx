@@ -18,7 +18,7 @@ import { useTaskChat } from './use-task-chat';
 import { useTaskControls } from './use-task-controls';
 import { ApprovalDock } from './approval-dock';
 import { VerificationPanel } from './verification-panel';
-import { SandboxNetwork } from './sandbox-network';
+
 import { RecoveryPanel } from './recovery-panel';
 import { ChangesReview } from '@/features/changes/review';
 import { OutputActions } from './output-actions';
@@ -40,7 +40,7 @@ export function TaskView({ taskId }: { taskId: string }) {
   const active = isActiveTaskState(chat.status);
   const motion = motionFor(chat.status, chat.snapshot?.outcome);
   const mode = chat.snapshot?.mode;
-  const modeName = mode === 'auto' ? 'خودکار در محیط ایزوله' : mode === 'grant' ? 'مجوز برای همین کار' : 'با تأیید';
+  const modeName = mode === 'auto' ? 'خودکار در فضای گفتگو' : mode === 'grant' ? 'مجوز برای همین کار' : 'با تأیید';
   const disconnected = chat.connection === 'offline' || chat.connection === 'reconnecting';
 
   return <div className="flex min-h-0 flex-1 flex-col">
@@ -77,9 +77,9 @@ export function TaskView({ taskId }: { taskId: string }) {
           <div className="mb-2"><ApprovalDock controls={controls} mode={mode} waiting={chat.status==='awaiting_action'} budget={chat.domain.budget}/></div>
           <PromptInput taskId={taskId} value={draft} onValueChange={text => setDraft(draftKey,text)} onSend={async () => { if(await chat.send(draft) && useUi.getState().drafts[draftKey]===draft) setDraft(draftKey,''); }} references={chat.references} onReferencesChange={chat.setReferences} disabled={chat.phase!=='ready' || ['failed','cancelled','recovery_required','stopping'].includes(chat.status ?? '')} sendDisabled={chat.streaming && !active} controls={<>
             <Link href="/settings" className={composerTool}><CpuIcon /><span>{readiness?.model.name ?? 'مدل تنظیم‌شده'}</span></Link>
-            <label className={composerTool}><ShieldCheckIcon/><span className="sr-only">سطح دسترسی</span><select aria-label="سطح دسترسی" value={mode??'ask'} disabled={controls.busy!==null || ['closed','failed','cancelled','recovery_required'].includes(chat.status??'')} onChange={event=>void controls.mode(event.target.value as 'ask'|'grant'|'auto')} className="bg-surface max-w-40 rounded text-xs focus-visible:outline-2 focus-visible:outline-primary"><option value="ask">با تأیید</option><option value="grant">مجوز برای همین کار</option><option value="auto">خودکار در محیط ایزوله</option></select></label>
+            <label className={composerTool}><ShieldCheckIcon/><span className="sr-only">سطح دسترسی</span><select aria-label="سطح دسترسی" value={mode??'ask'} disabled={controls.busy!==null || ['closed','failed','cancelled','recovery_required'].includes(chat.status??'')} onChange={event=>void controls.mode(event.target.value as 'ask'|'grant'|'auto')} className="bg-surface max-w-40 rounded text-xs focus-visible:outline-2 focus-visible:outline-primary"><option value="ask">با تأیید</option><option value="grant">مجوز برای همین کار</option><option value="auto">خودکار در فضای گفتگو</option></select></label>
             <button type="button" className={composerTool} onClick={()=>setPermissionsOpen(true)}>مجوزهای کار</button>
-            <span className={composerTool}><EyeIcon />{chat.snapshot?.read_only ? 'فقط خواندن' : 'نسخهٔ کاری ایزوله'}</span>
+            <span className={composerTool}><EyeIcon />{chat.snapshot?.read_only ? 'فقط خواندن' : 'فایل‌های این گفتگو'}</span>
             <span className="text-faint text-[11px]">{workspace?.name}</span>
           </>} hint={active ? 'پیامت را بفرست؛ بعد از اقدام جاری خوانده می‌شود.' : undefined} />
         </div>}
@@ -87,7 +87,7 @@ export function TaskView({ taskId }: { taskId: string }) {
     </div>
     <Dialog open={permissionsOpen} onOpenChange={setPermissionsOpen}><DialogContent title="مجوزهای همین کار" description={modeName}>
       <p className="text-muted-foreground text-sm leading-7">مجوز دائمی دستگاهی وجود ندارد. مجوز تکرار فقط برای همین کار و همین فرمان و تنظیمات است. تغییر سطح دسترسی، اقدامات منتظر را لغو می‌کند؛ اقدام در حال اجرا با «توقف» قطع می‌شود.</p>
-      <SandboxNetwork key={taskId} taskId={taskId} revision={chat.snapshot?.revision??0} status={chat.status} readOnly={chat.snapshot?.read_only??true}/>
+
       <ul aria-label="مجوزهای تکرار" className="flex max-h-56 flex-col gap-2 overflow-y-auto text-xs">
         {controls.grants.filter(grant=>grant.capability!=='sandbox_network').length===0 ? <li className="text-muted-foreground">مجوز تکراری ثبت نشده است.</li> : controls.grants.filter(grant=>grant.capability!=='sandbox_network').map(grant=><li key={grant.id} className="rounded border p-3">
           <p>{grant.active?'فعال':grant.revoked_at?'لغوشده':'غیرفعال یا منقضی'} · {grant.expiry?new Date(grant.expiry*1000).toLocaleString('fa-IR'):'حداکثر تا پایان همین کار'}</p>

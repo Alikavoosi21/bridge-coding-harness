@@ -117,8 +117,8 @@ async def test_a_task_cannot_be_deleted_while_it_holds_recovery_evidence(api):
 async def test_creating_a_task_without_a_workspace_is_refused(api):
     response = await api.post("/tasks", json={"prompt": "x"})
 
-    assert response.status_code == 409
-    assert response.json()["code"] == "conflict"
+    assert response.status_code == 202
+    assert response.json()["task"]["workspace_id"]
 
 
 async def test_validation_errors_use_the_same_shape(api):

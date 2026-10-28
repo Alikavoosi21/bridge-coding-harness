@@ -9,7 +9,11 @@ Bridge Coding Harness is a local, single-user Windows coding app. It does not in
 - Do not commit `.env`, provider keys, runtime settings, databases, checkpoints, traces, diagnostics or user projects. `.env.example` is credential-free and documents optional developer settings; `.env` is not automatically loaded.
 - Prompts and file contents that the agent reads are sent to the model endpoint you choose. Use a provider you trust with the project. Avoid committing or attaching secrets.
 
-## Execution and human control
+## Version 0.3.0: explicit local execution
+
+The current local build uses bundled Python/Node and Windows processes in per-conversation copies. Docker is no longer required. This is not an OS sandbox: reviewed commands have the Windows user permissions and network access. Filtering inherited secrets is not a guarantee that malicious code cannot read other user files or the credential store. Windows Job Objects bound the owned process tree and kill it when the engine exits. File-tool containment, plan approval, exact sensitive-action review and explicit apply remain. The Docker description below documents the previous 0.2.x release, not the default 0.3.0 runner.
+
+## Previous 0.2.x execution and human control
 
 Commands run in Docker on a separate project working copy, not through a host-shell fallback. The sandbox uses an unprivileged user, a read-only root filesystem, bounded resources, no Docker socket, and no network by default. Network access and package installation require applicable user consent. These controls reduce exposure; Docker and the host OS still need normal security maintenance.
 

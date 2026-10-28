@@ -41,7 +41,8 @@ async def _finish(api, thread_id: str) -> dict:
 async def test_nothing_runs_before_a_workspace_is_open(api):
     response = await api.post("/runs", json={"prompt": "سلام"})
 
-    assert response.status_code == 409
+    assert response.status_code == 200
+    await _finish(api,response.json()["thread_id"])
 
 
 async def test_a_task_runs_in_the_background_and_its_trace_is_readable(api):

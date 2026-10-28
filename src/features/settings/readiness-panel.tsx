@@ -39,8 +39,8 @@ const issueText: Record<string, string> = {
 
 /** The server explains the task mode in technical English; the UI says the same fact in Persian. */
 export function taskReasonText(readiness: Readiness | null): string {
-  if (!readiness) return 'وضعیت سندباکس خوانده نشد؛ تغییر فایل قطعاً ممکن نیست.';
-  if (readiness.task.can_write) return 'سندباکس آماده است؛ تغییر فایل ممکن است.';
+  if (!readiness) return 'وضعیت ابزار اجرا خوانده نشد؛ دوباره بررسی کن.';
+  if (readiness.task.can_write) return 'ابزارهای همراه آماده‌اند؛ فایل‌ها در فضای گفتگو ساخته می‌شوند.';
   const codes = new Set(readiness.issues.map((issue) => issue.code));
   if (codes.has('workspace_closed')) return 'هیچ پوشه‌ای باز نیست؛ اول پروژه را انتخاب کنید.';
   if (codes.has('model_missing') || codes.has('provider_key_missing')) return 'اول مدل را وصل کنید؛ بدون آن هیچ کاری شروع نمی‌شود.';
@@ -48,7 +48,7 @@ export function taskReasonText(readiness: Readiness | null): string {
   if (codes.has('docker_missing')) return 'Docker روی این سیستم نصب نیست؛ کار فقط می‌خواند.';
   if (codes.has('docker_unavailable')) return 'Docker نصب است اما موتور آن اجرا نشده؛ کار فقط می‌خواند.';
   if (codes.has('image_missing')) return 'image سندباکس ساخته نشده؛ کار فقط می‌خواند.';
-  return 'سندباکس هنوز آماده نیست؛ کار فقط می‌خواند.';
+  return 'ابزار اجرا هنوز آماده نیست؛ کار فقط می‌خواند.';
 }
 
 function State({ ok, label, detail, tone }: { ok: boolean | null; label: string; detail?: React.ReactNode; tone?: 'warning' | 'danger' }) {
@@ -66,93 +66,8 @@ function State({ ok, label, detail, tone }: { ok: boolean | null; label: string;
 
 /** The sandbox card, including the only place an image build can be agreed to. */
 export function RuntimeCard({ readiness, onChanged }: { readiness: Readiness | null; onChanged: () => Promise<unknown> | void }) {
-  const runtime = readiness?.runtime;
-  const [consent, setConsent] = useState(false);
-  const [building, setBuilding] = useState(false);
-  const [output, setOutput] = useState<string | null>(null);
-
-  const engineReachable = Boolean(runtime?.server_version);
-  const canBuild = engineReachable && !runtime?.image_present;
-
-  const build = async () => {
-    if (!consent) return;
-    setBuilding(true);
-    setOutput(null);
-    try {
-      const result = await api.post<{ build: { output?: string } }>('/runtime/prepare', { consent: true });
-      setOutput(result.build?.output || 'image با موفقیت ساخته شد.');
-      setConsent(false);
-      toast.success('image سندباکس ساخته شد.');
-      await onChanged();
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'ساخت image ممکن نشد.';
-      setOutput(message);
-      toast.error(message);
-    } finally {
-      setBuilding(false);
-    }
-  };
-
-  if (!runtime) {
-    return <State ok={null} label="وضعیت سندباکس خوانده نشد" detail="دوباره تلاش کنید." tone="warning" />;
-  }
-
-  return (
-    <div className="space-y-3">
-      <State
-        ok={runtime.available}
-        label={runtime.available ? 'سندباکس آماده است' : runtime.server_version ? 'image سندباکس ساخته نشده' : 'Docker آماده نیست'}
-        detail={
-          runtime.available
-            ? 'فرمان‌ها فقط داخل نسخهٔ کاری اجرا می‌شوند.'
-            : runtime.server_version
-              ? 'image سندباکس ساخته نشده؛ تغییر فایل ممکن نیست.'
-              : 'Docker یا موتور آن در دسترس نیست؛ تغییر فایل ممکن نیست.'
-        }
-        tone={runtime.available ? undefined : 'warning'}
-      />
-      <div className="text-muted-foreground space-y-1 text-xs leading-6">
-        <div>
-          image: <span dir="ltr" className="font-mono">{runtime.image}</span>
-        </div>
-        {runtime.server_version && (
-          <div>
-            Docker: <span dir="ltr" className="font-mono">{runtime.server_version}</span>
-          </div>
-        )}
-      </div>
-
-      {canBuild && (
-        <div className="bg-secondary/60 rounded-xl px-3.5 py-3">
-          <p className="text-xs leading-6">
-            ساخت image فقط از تعریف ثابت برنامه انجام می‌شود؛ هیچ فرمانی از این صفحه یا از مدل اجرا نمی‌شود. image با کاربر غیرروت، شبکهٔ قطع و سقف منابع اجرا خواهد شد.
-          </p>
-          {runtime.dockerfile && <PathText path={runtime.dockerfile} className="text-muted-foreground mt-1 text-[0.6875rem]" />}
-          <label className="mt-3 flex cursor-pointer items-center justify-between gap-3 text-xs font-medium">
-            <span>می‌فهمم و اجازهٔ ساخت این image را می‌دهم.</span>
-            <Switch checked={consent} onCheckedChange={setConsent} disabled={building} />
-          </label>
-          <Button className="mt-2" size="xs" disabled={!consent || building} onClick={build}>
-            {building ? 'در حال ساخت…' : 'ساخت image سندباکس'}
-          </Button>
-        </div>
-      )}
-
-      {!engineReachable && !runtime.server_version && (
-        <p className="text-muted-foreground text-xs leading-6">
-          {runtime.reason.includes('not installed')
-            ? 'این برنامه Docker را خودش نصب نمی‌کند و نصاب پنهانی ندارد. Docker Desktop را از سایت رسمی نصب کنید و دوباره این صفحه را تازه کنید. راهنمای محلی در docs/local-setup.md است.'
-            : 'Docker نصب است؛ برنامهٔ Docker را اجرا کنید و دوباره تازه کنید.'}
-        </p>
-      )}
-
-      {output && (
-        <pre dir="ltr" className="bg-secondary/60 text-muted-foreground max-h-40 overflow-auto rounded-lg px-3 py-2 font-mono text-[0.6875rem] whitespace-pre-wrap">
-          {output}
-        </pre>
-      )}
-    </div>
-  );
+  const runtime=readiness?.runtime;
+  return <div className="space-y-2"><State ok={runtime?.available??null} label={runtime?.available?'اجرای داخلی آماده است':'در حال بررسی ابزار اجرا'} detail="Python و Node همراه برنامه‌اند؛ Docker لازم نیست."/><p className="text-xs leading-6 text-muted-foreground">فایل‌ها در فضای همین گفتگو ساخته می‌شوند. فرمان‌ها محلی‌اند و دسترسی حساب ویندوز شما را دارند؛ عملیات حساس نیازمند تأیید است.</p></div>;
 }
 
 /** The four Step-status cards, each with the action that actually fixes it. */
@@ -214,8 +129,8 @@ export function ReadinessPanel() {
       <div className={cn('rounded-lg border px-5 py-4', readiness.task.can_write ? 'border-success/30 bg-success-soft' : 'border-warning/30 bg-warning-soft')}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Badge tone={readiness.task.mode === 'sandbox' ? 'success' : 'warning'}>{readiness.task.mode === 'sandbox' ? 'تغییر فایل ممکن است' : 'فقط خواندن'}</Badge>
-            <span className="text-sm font-medium">{readiness.task.can_write ? 'سندباکس و مدل آماده‌اند.' : 'تغییر فایل فعلاً ممکن نیست.'}</span>
+            <Badge tone={readiness.task.can_write ? 'success' : 'warning'}>{readiness.task.can_write ? 'تغییر فایل ممکن است' : 'فقط خواندن'}</Badge>
+            <span className="text-sm font-medium">{readiness.task.can_write ? 'ابزار اجرا و مدل آماده‌اند.' : 'تغییر فایل فعلاً ممکن نیست.'}</span>
           </div>
           <Button variant="outline" size="xs" onClick={refreshAll} disabled={busy}>
             <ArrowsClockwiseIcon className={cn(busy && 'animate-spin')} /> تازه‌سازی
@@ -270,7 +185,7 @@ export function ReadinessPanel() {
           />
           <Row
             leading={<CubeIcon className="text-muted-foreground size-5" />}
-            label="سندباکس Docker"
+            label="اجرای داخلی"
             description={<RuntimeCard readiness={readiness} onChanged={refreshAll} />}
           />
           <Row
@@ -313,7 +228,7 @@ export function ReadinessPanel() {
         <div className="flex items-start gap-2.5">
           <InfoIcon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
           <p className="text-muted-foreground text-xs leading-6">
-            برای تغییر کد، مدلِ بررسی‌شده و محیط Docker باید آماده باشند. برنامهٔ هر تسک را پیش از اجرا تأیید می‌کنی و تغییرات را در پایان بازبینی و اعمال می‌کنی.
+            برای تغییر کد، مدلِ بررسی‌شده و ابزار اجرای داخلی باید آماده باشند. برنامهٔ هر تسک را پیش از اجرا تأیید می‌کنی و تغییرات را در پایان بازبینی و اعمال می‌کنی.
           </p>
         </div>
       </div>

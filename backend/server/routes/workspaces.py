@@ -80,7 +80,7 @@ def list_workspaces() -> dict[str, Any]:
     store = _store()
     items: list[dict[str, Any]] = []
     seen: set[str] = set()
-    roots = list(dict.fromkeys([*data.get("workspaces", []), data.get("current_workspace")]))
+    roots = list(dict.fromkeys([data.get("current_workspace"), *data.get("workspaces", [])]))
     for root in roots:
         if not root or root in seen or not Path(root).is_dir():
             continue

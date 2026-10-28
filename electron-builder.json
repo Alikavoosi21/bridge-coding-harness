@@ -18,6 +18,10 @@
   ],
   "extraResources": [
     {
+      "from": "build/toolchain",
+      "to": "toolchain"
+    },
+    {
       "from": "backend/dist/harness-server",
       "to": "backend"
     }
